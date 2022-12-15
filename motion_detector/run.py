@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import cv2
 import numpy as np
 
@@ -6,15 +8,21 @@ from detector import MotionDetector
 from packer import pack_images
 from numba import jit
 
-
 @jit(nopython=True)
 def filter_fun(b):
     return ((b[2] - b[0]) * (b[3] - b[1])) > 300
 
+def convert_from_ms( milliseconds ): 
+	seconds, milliseconds = divmod(milliseconds,1000) 
+	minutes, seconds = divmod(seconds, 60) 
+	hours, minutes = divmod(minutes, 60) 
+	days, hours = divmod(hours, 24) 
+	seconds = seconds + milliseconds/1000 
+	return days, hours, minutes, seconds 
 
 if __name__ == "__main__":
 
-    cap = cv2.VideoCapture('tmp/helmets-v1-55.mp4')
+    cap = cv2.VideoCapture('/mnt/c/Temp/video.mp4')
     # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
@@ -64,8 +72,9 @@ if __name__ == "__main__":
         it = (end - begin) * 1000
 
         res.append(it)
-        print("StdDev: %.4f" % np.std(res), "Mean: %.4f" % np.mean(res), "Last: %.4f" % it,
-              "Boxes found: ", len(boxes))
+        if len(boxes) > 1:
+            days, hours, minutes, seconds = convert_from_ms(cap.get(cv2.CAP_PROP_POS_MSEC))
+            print(f"More boxes found on frame: {hours}:{minutes}:{seconds}")
 
         if len(res) > 10000:
             res = []
@@ -82,14 +91,14 @@ if __name__ == "__main__":
         else:
             fc[nc] = 0
 
-        if ctr % 100 == 0:
-            print("Total Frames: ", ctr, "Packed Frames:", fc)
+        # if ctr % 100 == 0:
+        #     print("Total Frames: ", ctr, "Packed Frames:", fc)
 
-        cv2.imshow('last_frame', frame)
-        cv2.imshow('detect_frame', detector.detection_boxed)
-        cv2.imshow('diff_frame', detector.color_movement)
+        # cv2.imshow('last_frame', frame)
+        # cv2.imshow('detect_frame', detector.detection_boxed)
+        # cv2.imshow('diff_frame', detector.color_movement)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        # if cv2.waitKey(1) & 0xFF == ord('q'):
+        #     break
 
     print(fc, ctr)

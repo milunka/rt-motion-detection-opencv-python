@@ -1,12 +1,6 @@
-# Noise-Tolerant High Performance Motion Detector
+# Motion detector
 
-The motion detector presented here is developed to be noise-tolerant &ndash; webcam noise, light noise, athmosphere turbulence noise, different kinds of tremblings can be successfully handled.
-
-You can download the video clip which is used in the demo at: https://box.bw-sw.com/f/c629c692d5c04b7caac6/?dl
-
-Place it in the `tmp` directory.
-
-Algorithm demonstration video screencast can be found at: https://youtu.be/FCme11alEmc
+Clone of repository https://github.com/bwsw/rt-motion-detection-opencv-python
 
 ## Build the project
 
@@ -23,6 +17,14 @@ To build, you can use **setup.py**, or directly **make** :
 
 And install use **pip**:
 * `pip install .`
+
+## Run
+
+* modify path to video file in file `run.py`
+```python
+cap = cv2.VideoCapture('/mnt/c/Temp/video.mp4')
+```
+* run file `run.py` in directory motion_detector
 
 ## Detector usage and parameters
 
@@ -101,18 +103,3 @@ if __name__ == "__main__":
             break
 
 ```
-
-## Performance
-
-The performance depends **greatly** from the values of following detector parameters:
-
-* Background substraction scale [`bg_subs_scale_percent`] (default 1/4), which leads to 480x230 frame for initial 1480x920 frame.
-* Size of the frame which is used to search for bounding boxes [`pixel_compression_ratio`] (default 1/10), which leads to 148x92 for initial 1480x920 frame.
-* Expansion step [`expansion_step`] which is used to find bounding boxes.
-
-So, for the sample [video](https://box.bw-sw.com/f/c629c692d5c04b7caac6/?dl) (1480x920@30FPS) and all these parameters set to default the expected performance results for a single frame processing are:
-
-* Mean frame processing time is `8.7262 ms`
-* Standard deviation is `8.9909 ms`
-
-on `Intel(R) Core(TM) i5-7440HQ CPU @ 2.80GHz` CPU.
